@@ -2,6 +2,7 @@ const faceFollow = document.querySelector('#face-follow');
 const faceTrackingStatus = document.querySelector('#face-tracking-status');
 const faceTrackingRetry = document.querySelector('#face-tracking-retry');
 const faceWorkerUrl = new URL('face-tracker-worker.js', document.currentScript.src);
+faceWorkerUrl.search = new URL(document.currentScript.src).search;
 const faceTracking = {
     worker: null, state: 'idle', pose: null, context: null,
     request: null, serial: 0, generation: 0, timer: null,

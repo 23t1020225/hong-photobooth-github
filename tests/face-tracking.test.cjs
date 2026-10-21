@@ -7,7 +7,7 @@ const root = path.resolve(__dirname, '..');
 const read = name => fs.readFileSync(path.join(root, name), 'utf8');
 const tick = () => new Promise(setImmediate);
 
-function fixture() {
+function fixture(search = '') {
     let now = 1000;
     const elements = new Map(), events = {}, workers = [], timers = new Map();
     let nextTimer = 0, bitmapClosed = 0;
@@ -28,7 +28,7 @@ function fixture() {
         URL, Worker, demo: false, stream: {}, stickerState: { type: 'cat' },
         updateStickerInteraction() {},
         document: {
-            currentScript: { src: 'https://example.test/hong/assets/js/face-tracker.js' },
+            currentScript: { src: 'https://example.test/hong/assets/js/face-tracker.js' + search },
             querySelector: element, addEventListener: (name, callback) => events[name] = callback,
             hidden: false
         },
@@ -52,6 +52,16 @@ const landmarks = {
     1: { x: .46, y: .56 }, 10: { x: .44, y: .2 }
 };
 const geometry = { videoWidth: 1280, videoHeight: 720, width: 800, height: 600, mirror: false };
+
+test('published scripts and face worker use the same release version to avoid stale effects', () => {
+    const html = read('index.html');
+    const sources = [...html.matchAll(/(?:src|href)="(assets\/(?:js|css)\/[^\"]+)"/g)].map(match => match[1]);
+    assert.ok(sources.length > 5);
+    assert.ok(sources.every(source => source.includes('?v=20261022-roach-detail-2')));
+    const f = fixture('?v=20261022-roach-detail-2');
+    f.events['camera-ready']();
+    assert.equal(f.workers[0].url.search, '?v=20261022-roach-detail-2');
+});
 
 test('pose matches center crop, mirror and face roll for landscape and portrait camera', () => {
     const { context } = fixture();
