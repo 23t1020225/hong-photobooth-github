@@ -55,6 +55,7 @@ function drawStickerFilter(context, width, height) {
     if (stickerState.type === 'none') return;
     const pose = getTrackedStickerPose();
     if (!pose) return;
+    if (stickerState.type === 'cute-roach' && !pose.manual) applyCuteRoachFaceLook(context, pose, width, height);
     context.save();
     context.filter = 'none';
     if (pose.manual) {
@@ -68,12 +69,20 @@ function drawStickerFilter(context, width, height) {
     context.lineCap = 'round';
     context.lineJoin = 'round';
     context.lineWidth = 5;
-    drawCharacterSticker(context, stickerState.type, pose.smile || 0);
+    const outline = !pose.manual && pose.outline?.length ? pose.outline.map(point => {
+        const dx = point.x - pose.x, dy = point.y - pose.y;
+        return {
+            x: (dx * Math.cos(pose.angle) + dy * Math.sin(pose.angle)) / (pose.scaleX * stickerState.scale),
+            y: (-dx * Math.sin(pose.angle) + dy * Math.cos(pose.angle)) / (pose.scaleY * stickerState.scale)
+        };
+    }) : [];
+    drawCharacterSticker(context, stickerState.type, pose.smile || 0, { outline });
     context.restore();
+    if (stickerState.type === 'cute-roach') drawCuteRoachMascot(context, width, height);
 }
 
-function drawCharacterSticker(context, type, smile = 0) {
-    if (cuteFilterTypes.has(type)) drawCuteSticker(context, type, smile);
+function drawCharacterSticker(context, type, smile = 0, options = {}) {
+    if (cuteFilterTypes.has(type)) drawCuteSticker(context, type, smile, options);
     else if (type === 'roach') drawRoachSticker(context);
     else if (['cat', 'bunny'].includes(type)) drawAnimalSticker(context, type);
     else drawSocialSticker(context, type);

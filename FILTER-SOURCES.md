@@ -57,3 +57,22 @@ Reference pictures are not bundled or fetched by the website. The new artwork
 uses the existing on-device tracking, capture and PNG export pipeline. Expressive
 ears respond to the averaged mouthSmileLeft/mouthSmileRight blendshape scores;
 the flower veil is a 2D illustration, not a cloth simulation or imported 3D effect.
+
+## Additional TikTok reference: Gián đáng yêu
+
+- Source: https://www.tiktok.com/effect/C8u95-e-%E2%9C%A8%F0%9F%8C%9F8D-4569305016
+- Creator shown on the effect page: unique_filter.
+- Public demo inspected: https://www.tiktok.com/@ninhduong.lanngoc/video/7673501649310190866
+- Website key: cute-roach, category: cute.
+- Reconstructed with original canvas paths: long antennae, pale blue hair roller,
+  face dots, blush and aqua outward cheek trails. This effect follows the whole
+  face; the earlier roach sticker remains a separate forehead decoration.
+- This is an approximation, not the creator's original effect package. No TikTok
+  media are bundled.
+- Detail pass: angular tapered antennae, darker ridged roller, dotted face mask
+  clipped to 36 tracked outline points, aqua cheek trails, and an original small
+  flexing cockroach illustration anchored near the lower-right of the camera.
+- The eye-corner landmarks support a separate local eye enlargement pass
+  (1.22x horizontal, 1.30x vertical) with feathered edges. This is an approximation
+  of the reference's look, not the original deformation algorithm or face makeup.
+  It is skipped without reliable eye landmarks, including manual/demo mode.

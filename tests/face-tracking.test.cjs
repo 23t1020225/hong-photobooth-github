@@ -94,6 +94,20 @@ test('initializes once, limits in-flight frames, tracks and clears a missing fac
     assert.match(f.element('#face-tracking-status').textContent, /Chưa thấy/);
 });
 
+test('eye corners and face outline map consistently when the camera is mirrored', () => {
+    const { context } = fixture();
+    const points = Object.fromEntries(Array.from({ length: 478 }, (_, i) => [i, { x: .5 + Math.sin(i) * .1, y: .5 + Math.cos(i) * .15 }]));
+    Object.assign(points, landmarks, { 133: { x: .39, y: .42 }, 362: { x: .51, y: .43 } });
+    const normal = context.facePoseFromLandmarks(points, geometry);
+    const mirrored = context.facePoseFromLandmarks(points, { ...geometry, mirror: true });
+    assert.equal(normal.outline.length, 36); assert.equal(normal.eyes.length, 2);
+    normal.eyes.forEach((eye, i) => {
+        assert.ok(Math.abs(eye.x + mirrored.eyes[i].x - 800) < 1e-8);
+        assert.ok(Math.abs(eye.width - mirrored.eyes[i].width) < 1e-8);
+    });
+    normal.outline.forEach((p, i) => assert.ok(Math.abs(p.x + mirrored.outline[i].x - 800) < 1e-8));
+});
+
 test('camera/mirror changes reject old coordinates and expired poses are hidden', async () => {
     const f = fixture(), c = f.context;
     f.events['camera-ready'](); const worker = f.workers[0]; worker.send({ type: 'ready' });
@@ -159,8 +173,9 @@ test('all character effects use the tracked transform, including forehead anchor
     let pose = { x: 310, y: 260, scaleX: 1.2, scaleY: 1.1, angle: .2, foreheadX: 300, foreheadY: 100 };
     const c = vm.createContext({ document: { querySelector: get, querySelectorAll: () => buttons }, getTrackedStickerPose: () => pose });
     vm.runInContext(read('assets/js/cute-filters.js'), c);
+    vm.runInContext(read('assets/js/face-look.js'), c);
     vm.runInContext(read('assets/js/sticker-filter.js'), c);
-    const drawing = new Proxy({}, { get: (_, method) => (...args) => calls.push([method, ...args]) });
+    const drawing = new Proxy({ createLinearGradient: () => ({ addColorStop() {} }) }, { get: (object, method) => method in object ? object[method] : (...args) => calls.push([method, ...args]) });
     const types = [...read('index.html').matchAll(/data-sticker="([^"]+)"/g)].map(match => match[1]);
     for (const type of types.filter(type => type !== 'none')) {
         vm.runInContext(`stickerState.type = '${type}'`, c);
@@ -198,7 +213,7 @@ test('worker closes transferred bitmaps and sends only the positioning landmarks
     assert.equal(options.outputFaceBlendshapes, true);
     await sandbox.onmessage({ data: { type: 'frame', id: 7, timestamp: 100, bitmap: { close() { closed++; } } } });
     assert.equal(closed, 1); assert.equal(messages[1].id, 7);
-    assert.deepEqual(Object.keys(messages[1].points), ['1', '10', '33', '263']);
+    for (const index of [1, 10, 33, 133, 362, 263, 152, 234, 454]) assert.ok(messages[1].points[index]);
     assert.equal(messages[1].points[1].z, undefined);
     assert.equal(messages[1].smile, .8);
 });

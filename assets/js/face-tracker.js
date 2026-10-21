@@ -95,10 +95,17 @@ function facePoseFromLandmarks(points, geometry) {
     const eyeX = (eyes[0].x + eyes[1].x) / 2, eyeY = (eyes[0].y + eyes[1].y) / 2;
     const noseOffset = -(nose.x - eyeX) * Math.sin(angle) + (nose.y - eyeY) * Math.cos(angle);
     const scaleY = Math.max(scaleX * .65, Math.min(scaleX * 1.45, noseOffset / 64));
+    const outline = [10,338,297,332,284,251,389,356,454,323,361,288,397,365,379,378,400,377,152,148,176,149,150,136,172,58,132,93,234,127,162,21,54,103,67,109].map(point);
+    const trackedEyes = [[33, 133], [362, 263]].map(([outer, inner]) => {
+        const a = point(outer), b = point(inner);
+        return a && b ? { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, width: Math.hypot(b.x - a.x, b.y - a.y) } : null;
+    });
     return {
         x: nose.x + Math.sin(angle) * 48 * scaleY, y: nose.y - Math.cos(angle) * 48 * scaleY,
         scaleX, scaleY, angle,
-        foreheadX: forehead.x - Math.sin(angle) * 18 * scaleY, foreheadY: forehead.y + Math.cos(angle) * 18 * scaleY
+        foreheadX: forehead.x - Math.sin(angle) * 18 * scaleY, foreheadY: forehead.y + Math.cos(angle) * 18 * scaleY,
+        outline: outline.every(Boolean) ? outline : [],
+        eyes: trackedEyes.every(Boolean) ? trackedEyes : []
     };
 }
 function updateFaceTracking(source, width, height, mirror, isDemo) {

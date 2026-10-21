@@ -30,7 +30,7 @@ Mở `http://127.0.0.1:4173`. Nếu cổng đang được sử dụng, dừng ph
 
 ## Xuất bản
 
-Đưa `index.html`, toàn bộ `assets/` và `.nojekyll` lên repository, giữ nguyên cấu trúc. Bật GitHub Pages cho nhánh chứa mã nguồn và thư mục gốc của repository. Địa chỉ dự kiến của repository hiện tại: `https://23t1020225.github.io/hong-photobooth/`.
+Đưa `index.html`, toàn bộ `assets/` và `.nojekyll` lên repository, giữ nguyên cấu trúc. Bật GitHub Pages cho nhánh chứa mã nguồn và thư mục gốc của repository. Địa chỉ dự kiến của repository hiện tại: `https://23t1020225.github.io/hong-photobooth-github/`.
 
 Tài nguyên dùng đường dẫn tương đối nên trang chạy được dưới đường dẫn tên repository. Camera cần HTTPS hoặc localhost và quyền truy cập từ trình duyệt. Google Fonts cần mạng; khi không tải được sẽ dùng phông dự phòng.
 
@@ -59,9 +59,9 @@ hỗ trợ hoặc tải lỗi, giao diện cho phép thử lại và chuyển sa
 
 Kiểm tra logic: `node --test tests/*.test.cjs`.
 
-## Bộ sưu tập 25 filter
+## Bộ sưu tập 26 filter
 
-Bảng chọn gồm 14 mẫu mới đã duyệt và 11 filter ban đầu, có hình xem trước từ
+Bảng chọn gồm 14 mẫu đã duyệt, Gián đáng yêu và 11 filter ban đầu, có hình xem trước từ
 chính hiệu ứng được vẽ trên camera. Có thể lọc theo Dễ thương, Mặt nạ, Phụ kiện
 hoặc Bộ đầu tiên; tùy chọn Không dùng luôn hiện để dễ tắt hiệu ứng.
 
@@ -70,3 +70,14 @@ bướm hồng, gấu trúc, mũ ếch dâu, dâu và hoa, gấu kẹo, kẹp t�
 mây trắng và mặt nạ bơ. Đây là các bản vẽ 2D tự dựng theo mẫu tham khảo, không
 phải gói hiệu ứng gốc nhập từ TikTok/Instagram. Tai biểu cảm dùng hai chỉ số
 mouthSmile để điều chỉnh tai; mặt nạ hoa là hình trang trí 2D, không mô phỏng vải.
+
+“Gián đáng yêu” nằm trong nhóm Dễ thương, được vẽ lại theo hiệu ứng TikTok
+4569305016 của unique_filter: râu dài, lô cuốn tóc xanh, chấm trên mặt và vệt
+xanh trên má. Hiệu ứng dùng vị trí khuôn mặt, không phải hình con gián nhỏ trên
+trán như filter Con gián ban đầu. Đây là bản tương tự bằng Canvas 2D, không nhập
+gói TikTok gốc. Bản chi tiết phóng mắt nhẹ bằng ảnh camera với viền hòa mềm,
+giới hạn lớp chấm theo đường viền mặt, chỉnh lại râu/lô cuốn/vệt xanh và thêm
+mascot gián ở góc dưới. Chỉ Gián đáng yêu dùng phần phóng mắt; các mẫu khác
+giữ nguyên khuôn mặt. Khi tắt bám mặt hoặc dùng ảnh mẫu, phần phóng mắt tắt
+vì không có điểm mắt thật. Hình ảnh và chuyển động là bản dựng gần giống,
+không bảo đảm trùng hoàn toàn với engine và tài nguyên TikTok gốc.

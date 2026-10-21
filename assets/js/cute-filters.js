@@ -1,9 +1,9 @@
-// Original vector artwork for the 14 reference styles approved in chat.
+// Original vector artwork for approved references, including TikTok effect 4569305016.
 // Coordinates share the face tracker: eye line y=-16, nose y=48.
 const cuteFilterTypes = new Set([
     'bunny-hat', 'expressive-ears', 'flower-veil', 'soft-freckles',
     'bunny-cheeks', 'pink-butterflies', 'panda', 'frog-hat',
-    'strawberry', 'gummy-bears', 'hair-clips', 'star-blush', 'clouds', 'avocado'
+    'strawberry', 'gummy-bears', 'hair-clips', 'star-blush', 'clouds', 'avocado', 'cute-roach'
 ]);
 
 function cuteEllipse(c, x, y, rx, ry, color) {
@@ -78,8 +78,10 @@ function cuteGummy(c, x, y, size, color) {
     for (const side of [-1, 1]) cuteEllipse(c, side * 7, -16, 2, 2, '#835168');
     cuteEllipse(c, 0, -8, 4, 3, '#a56379'); c.restore();
 }
-function drawCuteSticker(c, type, smile = 0) {
-    if (type === 'bunny-hat') {
+function drawCuteSticker(c, type, smile = 0, options = {}) {
+    if (type === 'cute-roach') {
+        drawCuteRoachSticker(c, options);
+    } else if (type === 'bunny-hat') {
         for (const side of [-1, 1]) {
             c.save(); c.translate(side * 97, -170); c.rotate(side * .14);
             cuteEllipse(c, 0, -50, 33, 94, '#fff9ef'); cuteEllipse(c, 0, -53, 15, 65, '#efbed2'); c.restore();
@@ -176,4 +178,94 @@ function drawCuteSticker(c, type, smile = 0) {
         cuteEllipse(c, 0, 187, 35, 26, '#b68963'); cuteEllipse(c, -8, 179, 12, 8, '#d1aa7f');
         cuteBlush(c);
     }
+}
+
+// Reference: TikTok effect 4569305016 by unique_filter.
+// Original 2D reconstruction: antennae, blue roller, dotted mask and aqua cheek trails.
+function drawCuteRoachSticker(c, options = {}) {
+    // A fixed pattern avoids random flicker between camera frames and photographs.
+    c.save(); c.beginPath();
+    if (options.outline?.length) {
+        options.outline.forEach((point, index) => index ? c.lineTo(point.x, point.y) : c.moveTo(point.x, point.y)); c.closePath();
+    } else c.ellipse(0, 20, 123, 154, 0, 0, Math.PI * 2);
+    c.clip();
+    for (let row = 0; row < 17; row++) for (let column = 0; column < 16; column++) {
+        const x = -120 + column * 16 + (row % 2) * 8;
+        const y = -96 + row * 16;
+        if ((x / 130) ** 2 + ((y - 20) / 161) ** 2 > 1) continue;
+        // Keep the eye and mouth openings clear.
+        if ((Math.abs(x) - 70) ** 2 / 32 ** 2 + (y + 16) ** 2 / 23 ** 2 < 1 ||
+            x ** 2 / 37 ** 2 + (y - 95) ** 2 / 23 ** 2 < 1) continue;
+        cuteEllipse(c, x, y, .95, 1.15, '#3d333480');
+    }
+    c.restore();
+    cuteBlush(c, '44');
+    for (const side of [-1, 1]) {
+        // Long antennae are anchored to the forehead, not a separate floating bug.
+        c.strokeStyle = '#211d1c'; c.lineWidth = 2.6; c.lineCap = 'round';
+        c.beginPath(); c.moveTo(side * 28, -131);
+        c.lineTo(side * 48, -199); c.lineTo(side * 82, -263);
+        c.quadraticCurveTo(side * 86, -270, side * 95, -263);
+        c.bezierCurveTo(side * 193, -209, side * 251, -49, side * 194, 144); c.stroke();
+        c.fillStyle = '#211d1c'; c.beginPath(); c.moveTo(side * 21, -130);
+        c.quadraticCurveTo(side * 33, -180, side * 48, -199);
+        c.lineTo(side * 82, -263); c.lineTo(side * 53, -195); c.lineTo(side * 34, -130); c.closePath(); c.fill();
+        // Aqua comic tears extend outwards from both cheeks.
+        c.fillStyle = '#e8ffff'; c.strokeStyle = '#4bd0ce'; c.lineWidth = 2.2;
+        c.beginPath(); c.moveTo(side * 72, 30);
+        c.bezierCurveTo(side * 105, 19, side * 178, 27, side * 247, 67);
+        c.quadraticCurveTo(side * 190, 52, side * 142, 43);
+        c.quadraticCurveTo(side * 106, 42, side * 74, 37); c.closePath(); c.fill(); c.stroke();
+        c.strokeStyle = '#a1efeb'; c.lineWidth = 4;
+        c.beginPath(); c.moveTo(side * 91, 35); c.quadraticCurveTo(side * 138, 30, side * 201, 49); c.stroke();
+        for (const [x,y] of [[98,29],[126,32],[156,36],[185,46]]) cuteEllipse(c, side * x, y, .8, 1.3, '#3cbdb9');
+    }
+    // Pale blue hair roller: side caps and fine ridges, drawn into the camera bitmap.
+    const roller = c.createLinearGradient(0, -142, 0, -72);
+    roller.addColorStop(0, '#d0dcdd'); roller.addColorStop(.35, '#8c989d'); roller.addColorStop(.62, '#67777d'); roller.addColorStop(1, '#d7e7e9');
+    c.fillStyle = roller; c.strokeStyle = '#98b7c3'; c.lineWidth = 2;
+    c.beginPath(); c.roundRect(-47, -142, 94, 70, 4); c.fill(); c.stroke();
+    for (const side of [-1, 1]) {
+        c.fillStyle = '#dcf2fa'; c.beginPath(); c.roundRect(side < 0 ? -47 : 28, -143, 19, 72, 3); c.fill();
+        c.strokeStyle = '#a9c9d6'; c.lineWidth = 1;
+        for (let i = 0; i < 4; i++) {
+            const x = side < 0 ? -43 + i * 4 : 31 + i * 4;
+            c.beginPath(); c.moveTo(x, -137); c.lineTo(x, -76); c.stroke();
+        }
+        for (let y = -131; y < -78; y += 11) cuteEllipse(c, side * 37, y, .9, 1.5, '#819ca9');
+    }
+    c.strokeStyle = '#35474b99'; c.lineWidth = .8;
+    for (let x = -25; x <= 25; x += 3) {
+        c.beginPath(); c.moveTo(x, -138); c.quadraticCurveTo(x - 2, -106, x, -75); c.stroke();
+    }
+}
+
+function drawCuteRoachMascot(context, width, height) {
+    context.save(); context.filter = 'none';
+    context.translate(width * .84, height * .83);
+    const size = Math.min(width, height) / 600 * .72;
+    context.scale(size, size); context.lineJoin = 'round'; context.lineCap = 'round';
+    context.strokeStyle = '#3a302d'; context.fillStyle = '#cd9668'; context.lineWidth = 2.7;
+    for (const side of [-1, 1]) {
+        context.beginPath(); context.moveTo(side * 19, -3); context.lineTo(side * 36, -14);
+        context.lineTo(side * 38, -31); context.lineTo(side * 31, -36); context.lineTo(side * 32, -46);
+        context.lineTo(side * 47, -44); context.lineTo(side * 51, -36); context.lineTo(side * 48, -28);
+        context.quadraticCurveTo(side * 58, -5, side * 41, 9); context.lineTo(side * 22, 15);
+        context.closePath(); context.fill(); context.stroke();
+        context.beginPath(); context.moveTo(side * 37, -40); context.lineTo(side * 45, -38); context.stroke();
+        context.beginPath(); context.moveTo(side * 7, -42); context.lineTo(side * 11, -56); context.stroke();
+    }
+    context.beginPath(); context.ellipse(0, 20, 26, 39, 0, 0, Math.PI * 2); context.fill(); context.stroke();
+    context.fillStyle = '#e6ad7d';
+    context.beginPath(); context.ellipse(0, -22, 33, 25, 0, 0, Math.PI * 2); context.fill(); context.stroke();
+    cuteEllipse(context, -11, -26, 2.5, 3.5, '#3a302d'); cuteEllipse(context, 11, -26, 2.5, 3.5, '#3a302d');
+    context.beginPath(); context.moveTo(-6, -11); context.quadraticCurveTo(0, -7, 6, -11); context.stroke();
+    context.lineWidth = 2;
+    for (const side of [-1, 1]) {
+        context.beginPath(); context.moveTo(side * 5, 9); context.quadraticCurveTo(side * 13, 14, side * 22, 9); context.stroke();
+        for (const y of [25, 36, 47]) {
+            context.beginPath(); context.moveTo(side * 5, y); context.lineTo(side * 16, y - 2); context.stroke();
+        }
+    }
+    context.beginPath(); context.moveTo(0, 18); context.lineTo(0, 51); context.stroke(); context.restore();
 }

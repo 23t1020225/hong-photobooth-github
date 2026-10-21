@@ -9,7 +9,7 @@ const html = read('index.html');
 
 function drawing() {
     const calls = [];
-    return new Proxy({ calls }, { get: (object, name) => name in object ? object[name] : (...args) => calls.push([name, ...args]) });
+    return new Proxy({ calls, createLinearGradient: () => ({ addColorStop() {} }) }, { get: (object, name) => name in object ? object[name] : (...args) => calls.push([name, ...args]) });
 }
 class Element {
     constructor() { this.listeners = {}; this.style = {}; this.attrs = {}; this.dataset = {}; this.hidden = false; this.context = drawing(); }
@@ -38,16 +38,17 @@ function fixture() {
         getTrackedStickerPose: () => pose, busy: false, demo: true, stream: null
     });
     vm.runInContext(read('assets/js/cute-filters.js'), context);
+    vm.runInContext(read('assets/js/face-look.js'), context);
     vm.runInContext(read('assets/js/sticker-filter.js'), context);
     return { context, buttons, categories, element, setPose: value => pose = value };
 }
 
-test('all 14 approved styles are available alongside the original 11', () => {
+test('all 14 approved styles and the new TikTok reference are available alongside the original 11', () => {
     const f = fixture();
-    assert.equal(f.buttons.length, 26); // Includes "Không dùng".
-    assert.equal(new Set(f.buttons.map(button => button.dataset.sticker)).size, 26);
+    assert.equal(f.buttons.length, 27); // Includes "Không dùng" and the new TikTok reference.
+    assert.equal(new Set(f.buttons.map(button => button.dataset.sticker)).size, 27);
     assert.deepEqual(f.buttons.filter(button => button.dataset.reference).map(button => Number(button.dataset.reference)).sort((a, b) => a - b), Array.from({ length: 14 }, (_, i) => i + 1));
-    assert.equal(f.buttons.filter(button => button.thumbnail).length, 25);
+    assert.equal(f.buttons.filter(button => button.thumbnail).length, 26);
     for (const button of f.buttons.filter(button => button.thumbnail)) {
         assert.ok(button.thumbnail.context.calls.some(call => call[0] === 'fill'));
     }
