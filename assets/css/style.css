@@ -12,3 +12,10 @@
 .save-dialog .save-location{text-align:center;margin:12px 0 0}
 body:has(.save-dialog[open]){overflow:hidden}
 @media(max-width:550px){.save-dialog{padding:18px}.save-dialog h2{font-size:22px}}
+#save-share{width:100%;min-height:44px;margin-top:10px}
+#save-share[hidden]{display:none}
+#save-feedback:empty{display:none}
+.save-dialog .close-dialog{min-width:44px;min-height:44px;touch-action:manipulation}
+#save-png{min-height:44px;touch-action:manipulation}
+.save-dialog{overscroll-behavior:contain}
+@media(max-width:550px){.save-dialog{width:calc(100% - 24px);max-width:560px;padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom));max-height:calc(100dvh - 24px)}.save-dialog p{font-size:13px}.save-dialog h2{font-size:21px}#save-preview{max-height:48dvh}}

@@ -1,6 +1,26 @@
 cuteFrames.push(...customFrames);
 const frameAssets=new Map();
-const customFramesReady=Promise.all(customFrames.map(f=>new Promise(resolve=>{const im=new Image();im.onload=()=>{frameAssets.set(f.id,im);resolve();};im.onerror=()=>resolve();im.src=f.asset;})));
+const pendingFrameAssets=new Map();
+function loadFrameAsset(frame){
+ if(!frame.custom)return Promise.resolve();
+ if(frameAssets.has(frame.id))return Promise.resolve(frameAssets.get(frame.id));
+ if(pendingFrameAssets.has(frame.id))return pendingFrameAssets.get(frame.id);
+ const promise=new Promise((resolve,reject)=>{
+  const image=new Image();
+  const timer=setTimeout(()=>finish(false),15000);
+  function finish(loaded){
+   clearTimeout(timer);image.onload=null;image.onerror=null;
+   if(loaded){frameAssets.set(frame.id,image);resolve(image);}
+   else reject(new Error('Chưa tải được khung “'+frame.name+'”. Bạn kiểm tra mạng rồi bấm tải lại nhé.'));
+  }
+  image.onload=()=>finish(true);image.onerror=()=>finish(false);image.src=frame.asset;
+ });
+ pendingFrameAssets.set(frame.id,promise);
+ const cleanup=()=>pendingFrameAssets.delete(frame.id);
+ promise.then(cleanup,cleanup);
+ return promise;
+}
+const customFramesReady=Promise.allSettled(customFrames.map(loadFrameAsset));
 const paintBeforeCustom=paintCuteStrip;
 paintCuteStrip=function(c,f,images,n,caption,dateText){if(!f.custom)return paintBeforeCustom(c,f,images,n,caption,dateText);const asset=frameAssets.get(f.id);c.canvas.width=f.width;c.canvas.height=f.height+90;c.fillStyle='#fff9f3';c.fillRect(0,0,c.canvas.width,c.canvas.height);for(let i=0;i<f.slots.length;i++){const [x,y,w,h]=f.slots[i],im=images[i];if(im){const s=Math.max(w/im.width,h/im.height),sw=w/s,sh=h/s;c.drawImage(im,(im.width-sw)/2,(im.height-sh)/2,sw,sh,x,y,w,h);}else{c.fillStyle='#e9ddd8';c.fillRect(x,y,w,h);c.fillStyle='#b28b8b';c.textAlign='center';c.font=`${Math.max(15,w*.15)}px Georgia`;c.fillText('♡',x+w/2,y+h/2);}}if(asset)c.drawImage(asset,0,0);c.fillStyle='#79504d';c.textAlign='center';c.font=`${Math.max(13,f.width*.032)}px sans-serif`;c.fillText(caption||'một chút hồng, một chút bạn.',f.width/2,f.height+36,f.width-24);c.font=`${Math.max(10,f.width*.022)}px sans-serif`;c.fillText(dateText,f.width/2,f.height+68);return c.canvas;};
 customFramesReady.then(()=>{document.querySelectorAll('.frame-picker button[data-frame]').forEach(b=>{const f=customFrames.find(x=>x.id===b.dataset.frame);if(f)paintCuteStrip(b.querySelector('canvas').getContext('2d'),f,[],f.slots.length,'','');});updateCutePreview();});
