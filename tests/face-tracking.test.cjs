@@ -144,7 +144,7 @@ test('load errors/timeouts fall back to manual; retry and teardown release resou
     assert.equal(f.element('#face-tracking-retry').hidden, false);
     f.element('#face-tracking-retry').listeners.click();
     assert.equal(f.workers.length, 2);
-    [...f.timers.values()].find(timer => timer.delay === 45000).callback();
+    [...f.timers.values()].find(timer => timer.delay === 12000).callback();
     assert.equal(f.state().state, 'failed');
     f.events.pagehide();
     assert.equal(f.state().worker, null);

@@ -47,7 +47,7 @@ function startFaceTracking() {
     try {
         const worker = faceTracking.useMain ? createMainFaceTrackerWorker() : new Worker(faceWorkerUrl);
         faceTracking.worker = worker;
-        faceTracking.timer = setTimeout(failFaceTracking, 45000);
+        faceTracking.timer = setTimeout(failFaceTracking, faceTracking.useMain ? 45000 : 12000);
         worker.onerror = event => { event.preventDefault(); if (faceTracking.worker === worker) failFaceTracking(); };
         worker.onmessageerror = () => { if (faceTracking.worker === worker) failFaceTracking(); };
         worker.onmessage = event => {

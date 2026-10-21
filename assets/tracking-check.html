@@ -1,8 +1,31 @@
 <!doctype html><meta charset="utf-8"><title>Face tracking check</title><pre id="result">Starting…</pre><script src="js/face-tracker-fallback.js"></script><script>
 const out=document.querySelector('#result');
-const worker=new Worker('js/face-tracker-worker.js');
-worker.onmessage=e=>{out.textContent+='\nWorker: '+JSON.stringify(e.data);};
-worker.onerror=e=>out.textContent+='\nWorker: '+e.message;
-worker.postMessage({type:'init'});
-const fallback=createMainFaceTrackerWorker();fallback.onmessage=e=>out.textContent+='\nFallback: '+JSON.stringify(e.data);fallback.postMessage({type:'init'});
+const image=new Image();image.crossOrigin='anonymous';image.src='https://storage.googleapis.com/mediapipe-assets/portrait.jpg';
+const imageReady=new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=reject});
+function run(worker,label){
+ let firstX;
+ worker.onmessage=async e=>{
+  const data=e.data;
+  if(data.type==='result'){
+   const x=data.points?.[1]?.x;
+   out.textContent+='\n'+label+' frame '+data.id+': nose='+x;
+   if(data.id===1){firstX=x;await frame(2,100)}
+   else {out.textContent+='\n'+label+': '+(Number.isFinite(firstX)&&x>firstX+.05?'PASS moving face':'FAIL moving face');worker.terminate()}
+  }else{
+   out.textContent+='\n'+label+': '+JSON.stringify(data);
+   if(data.type==='ready'){await imageReady;await frame(1,0)}
+  }
+ };
+ async function frame(id,offset){
+  const canvas=document.createElement('canvas');canvas.width=800;canvas.height=600;
+  const ctx=canvas.getContext('2d');ctx.fillStyle='#ddd';ctx.fillRect(0,0,800,600);
+  ctx.drawImage(image,offset,0,image.width*600/image.height,600);
+  const bitmap=await createImageBitmap(canvas);
+  worker.postMessage({type:'frame',id,timestamp:performance.now(),bitmap},[bitmap]);
+ }
+ worker.onerror=e=>out.textContent+='\n'+label+': '+e.message;
+ worker.postMessage({type:'init'});
+}
+run(new Worker('js/face-tracker-worker.js'),'Worker');
+run(createMainFaceTrackerWorker(),'Fallback');
 </script>
