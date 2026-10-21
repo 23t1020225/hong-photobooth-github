@@ -59,6 +59,28 @@
                     <div class="camera-bottom"><span id="status" role="status">Camera đang chờ bạn</span><span>✦ HỒNG
                             STUDIO</span></div>
                 </div>
+                <div class="sticker-controls" aria-label="Filter nhân vật trên camera">
+                    <div class="sticker-heading">Filter nhân vật <span id="sticker-current" role="status">Không dùng</span></div>
+                    <div class="sticker-options" role="group" aria-label="Chọn filter nhân vật">
+                        <button type="button" data-sticker="none" aria-pressed="true"><span aria-hidden="true">∅</span>Không dùng</button>
+                        <button type="button" data-sticker="cat" aria-pressed="false"><span aria-hidden="true">🐱</span>Mèo</button>
+                        <button type="button" data-sticker="roach" aria-pressed="false"><span aria-hidden="true">🪳</span>Con gián</button>
+                        <button type="button" data-sticker="bunny" aria-pressed="false"><span aria-hidden="true">🐰</span>Thỏ</button>
+                        <button type="button" data-sticker="puppy" aria-pressed="false"><span aria-hidden="true">🐶</span>Cún con</button>
+                        <button type="button" data-sticker="bear" aria-pressed="false"><span aria-hidden="true">🐻</span>Gấu nhỏ</button>
+                        <button type="button" data-sticker="hearts" aria-pressed="false"><span aria-hidden="true">💕</span>Tim má</button>
+                        <button type="button" data-sticker="freckles" aria-pressed="false"><span aria-hidden="true">☀️</span>Tàn nhang</button>
+                        <button type="button" data-sticker="butterflies" aria-pressed="false"><span aria-hidden="true">🦋</span>Bướm tím</button>
+                        <button type="button" data-sticker="flowers" aria-pressed="false"><span aria-hidden="true">🌸</span>Vòng hoa</button>
+                        <button type="button" data-sticker="glasses" aria-pressed="false"><span aria-hidden="true">🕶️</span>Kính râm</button>
+                        <button type="button" data-sticker="sparkles" aria-pressed="false"><span aria-hidden="true">✨</span>Lấp lánh</button>
+                    </div>
+                    <div id="sticker-adjustments" hidden>
+                        <label for="sticker-size">Kích thước <output id="sticker-size-value" for="sticker-size">100%</output></label>
+                        <input id="sticker-size" type="range" min="50" max="150" value="100" step="5">
+                        <p>Kéo trên camera để đặt filter vừa khuôn mặt. Filter giữ nguyên vị trí khi bạn di chuyển và được lưu vào ảnh chụp.</p>
+                    </div>
+                </div>
                 <div class="shoot-row"><span class="handwritten" id="pose">cứ là chính mình nhé ↗</span><button
                         id="capture" class="shutter" disabled><span>●</span> Chụp một kỷ niệm</button><button
                         id="switch" class="icon-button" aria-label="Đổi camera">↻</button></div>
@@ -97,6 +119,7 @@
         <p class="save-location">Ảnh thường nằm trong Downloads / Tải xuống.</p>
     </dialog>
     <script src="assets/js/save-photo.js"></script>
+    <script src="assets/js/sticker-filter.js"></script>
     <script src="assets/js/app.js"></script>
     <script src="assets/js/frames.js"></script>
     <script src="assets/js/couple-frames.js"></script>

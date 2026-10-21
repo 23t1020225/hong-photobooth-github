@@ -6,3 +6,19 @@
 #cute-preview[aria-busy="true"]{visibility:hidden;pointer-events:none}
 .compact-layout .result{scroll-margin-top:16px}
 @media(max-width:550px){.choose-frame{min-height:48px}.cute-strip .slot button{min-height:44px}.frame-dialog .close-dialog{min-width:44px;min-height:44px}}
+.sticker-controls{margin-top:18px;padding:14px;background:#fffaf3;border:1px solid #e2d2c7;border-radius:10px}
+.sticker-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;margin-bottom:10px}
+#sticker-current{color:var(--red);font-size:11px}
+.sticker-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.sticker-options button{min-width:0;min-height:62px;padding:8px 4px;background:transparent;border:1px solid #e2d2c7;border-radius:8px;color:var(--ink);font-size:11px;touch-action:manipulation}
+.sticker-options button span{display:block;font-size:24px;margin-bottom:4px;line-height:1.2}
+.sticker-options button[aria-pressed="true"]{background:#f7dfe6;border-color:var(--red);color:var(--red)}
+#sticker-adjustments{margin-top:14px}
+#sticker-adjustments[hidden]{display:none}
+#sticker-adjustments label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:8px}
+#sticker-adjustments input{width:100%;min-height:24px}
+#sticker-adjustments p{font-size:11px;line-height:1.7;color:var(--muted);margin:8px 0 0}
+@media(max-width:550px){.sticker-controls{padding:12px}.sticker-options{gap:6px}.sticker-options button{min-height:64px}.sticker-options button span{font-size:26px}}
+.sticker-options{max-height:218px;overflow-y:auto;padding:3px;scrollbar-width:thin;scrollbar-color:#c69b9a transparent}
+.sticker-options button:focus-visible{outline-offset:0}
+@media(max-width:550px){.sticker-options{max-height:222px;grid-template-columns:repeat(3,minmax(0,1fr))}}
