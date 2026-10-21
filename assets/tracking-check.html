@@ -9,7 +9,8 @@ function run(worker,label){
   if(data.type==='result'){
    const x=data.points?.[1]?.x;
    out.textContent+='\n'+label+' frame '+data.id+': nose='+x;
-   if(data.id===1){firstX=x;await frame(2,100)}
+   if(data.id===1){firstX=x;await frame(2,20)}
+   else if(data.id<8){await frame(data.id+1,Math.min(100,data.id*20))}
    else {out.textContent+='\n'+label+': '+(Number.isFinite(firstX)&&x>firstX+.05?'PASS moving face':'FAIL moving face');worker.terminate()}
   }else{
    out.textContent+='\n'+label+': '+JSON.stringify(data);
