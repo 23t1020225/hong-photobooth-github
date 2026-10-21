@@ -4,6 +4,12 @@ const stickerCanvas = document.querySelector('#preview');
 const stickerButtons = document.querySelectorAll('[data-sticker]');
 const stickerSize = document.querySelector('#sticker-size');
 let stickerPointer = null;
+function updateStickerInteraction() {
+    const manual = getTrackedStickerPose()?.manual;
+    const draggable = stickerState.type !== 'none' && manual;
+    stickerCanvas.style.touchAction = draggable ? 'none' : 'auto';
+    stickerCanvas.style.cursor = draggable ? 'move' : '';
+}
 
 stickerButtons.forEach(button => button.addEventListener('click', () => {
     if (busy) return;
@@ -15,6 +21,7 @@ stickerButtons.forEach(button => button.addEventListener('click', () => {
     document.querySelector('#sticker-adjustments').hidden = stickerState.type === 'none';
     stickerCanvas.style.touchAction = stickerState.type === 'none' ? 'auto' : 'none';
     stickerCanvas.style.cursor = stickerState.type === 'none' ? '' : 'move';
+    updateStickerInteraction();
 }));
 stickerSize.addEventListener('input', () => {
     if (busy) return;
@@ -29,14 +36,14 @@ function moveSticker(event) {
     stickerState.y = Math.max(.05, Math.min(.95, (event.clientY - bounds.top) / bounds.height));
 }
 stickerCanvas.addEventListener('pointerdown', event => {
-    if (busy || stickerState.type === 'none' || (!demo && !stream) ||
+    if (busy || !getTrackedStickerPose()?.manual || stickerState.type === 'none' || (!demo && !stream) ||
         stickerPointer !== null || (event.pointerType === 'mouse' && event.button !== 0)) return;
     stickerPointer = event.pointerId;
     stickerCanvas.setPointerCapture(event.pointerId);
     moveSticker(event);
 });
 stickerCanvas.addEventListener('pointermove', event => {
-    if (!busy && event.pointerId === stickerPointer) moveSticker(event);
+    if (!busy && getTrackedStickerPose()?.manual && event.pointerId === stickerPointer) moveSticker(event);
 });
 for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) {
     stickerCanvas.addEventListener(name, event => {
@@ -46,17 +53,30 @@ for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) {
 
 function drawStickerFilter(context, width, height) {
     if (stickerState.type === 'none') return;
+    const pose = getTrackedStickerPose();
+    if (!pose) return;
     context.save();
     context.filter = 'none';
-    context.translate(stickerState.x * width, stickerState.y * height);
-    context.scale(width / 800 * stickerState.scale, width / 800 * stickerState.scale);
+    if (pose.manual) {
+        context.translate(stickerState.x * width, stickerState.y * height);
+        context.scale(width / 800 * stickerState.scale, width / 800 * stickerState.scale);
+    } else {
+        context.translate(stickerState.type === 'roach' ? pose.foreheadX : pose.x, stickerState.type === 'roach' ? pose.foreheadY : pose.y);
+        context.rotate(pose.angle);
+        context.scale(pose.scaleX * stickerState.scale, pose.scaleY * stickerState.scale);
+    }
     context.lineCap = 'round';
     context.lineJoin = 'round';
     context.lineWidth = 5;
-    if (stickerState.type === 'roach') drawRoachSticker(context);
-    else if (['cat', 'bunny'].includes(stickerState.type)) drawAnimalSticker(context, stickerState.type);
-    else drawSocialSticker(context, stickerState.type);
+    drawCharacterSticker(context, stickerState.type, pose.smile || 0);
     context.restore();
+}
+
+function drawCharacterSticker(context, type, smile = 0) {
+    if (cuteFilterTypes.has(type)) drawCuteSticker(context, type, smile);
+    else if (type === 'roach') drawRoachSticker(context);
+    else if (['cat', 'bunny'].includes(type)) drawAnimalSticker(context, type);
+    else drawSocialSticker(context, type);
 }
 
 function drawAnimalSticker(c, type) {
@@ -193,3 +213,31 @@ function stickerHeart(c, x, y, size, color) {
     c.beginPath(); c.moveTo(0, 16); c.bezierCurveTo(-32, -3, -17, -28, 0, -11);
     c.bezierCurveTo(17, -28, 32, -3, 0, 16); c.fill(); c.restore();
 }
+
+const stickerCategories = document.querySelectorAll('[data-sticker-category]');
+stickerCategories.forEach(category => category.addEventListener('click', () => {
+    stickerCategories.forEach(item => item.setAttribute('aria-pressed', String(item === category)));
+    const group = category.dataset.stickerCategory;
+    stickerButtons.forEach(button => {
+        button.hidden = group !== 'all' && button.dataset.sticker !== 'none' && button.dataset.stickerGroup !== group;
+    });
+}));
+
+// Preview the same original artwork that will be drawn on the live camera.
+stickerButtons.forEach(button => {
+    if (button.dataset.sticker === 'none') return;
+    const thumbnail = document.createElement('canvas');
+    thumbnail.width = thumbnail.height = 180;
+    thumbnail.setAttribute('aria-hidden', 'true');
+    const c = thumbnail.getContext('2d');
+    c.fillStyle = '#f4e6e5'; c.fillRect(0, 0, 180, 180);
+    c.translate(90, 94); c.scale(.28, .28);
+    cuteEllipse(c, 0, 330, 180, 190, '#c4a5ad');
+    cuteEllipse(c, 0, 16, 121, 146, '#f6dece');
+    c.strokeStyle = '#805c60'; c.lineWidth = 8; c.lineCap = 'round';
+    for (const side of [-1, 1]) cuteEllipse(c, side * 58, -16, 6, 8, '#805c60');
+    c.beginPath(); c.arc(0, 64, 22, 0, Math.PI); c.stroke();
+    c.lineWidth = 5; c.lineJoin = 'round';
+    drawCharacterSticker(c, button.dataset.sticker, .8);
+    button.querySelector('span').replaceChildren(thumbnail);
+});
