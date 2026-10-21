@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Hồng — Một chút hồng, một chút bạn</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/compact.css"></head>
+
+<body>
+    <header><a class="brand" href="./">hồng<span>✳</span></a><span class="tagline">TIỆM ẢNH NHỎ TRÊN
+            INTERNET</span><span class="private">♡ Ảnh chỉ ở trên máy bạn</span></header>
+    <main>
+        <div class="intro">
+            <div class="eyebrow">MAKE A LITTLE MEMORY · EST. 2026</div>
+            <h1>Một chút hồng,<br>một chút <em>bạn.</em><span class="spark">✧</span></h1>
+            <p>Gác lại một chút. Cười xinh một chút.<br>Giữ hôm nay trong một dải ảnh.</p>
+        </div>
+        <section class="studio">
+            <aside class="controls">
+                <div class="section-label">01 / CHỌN VIBE CỦA BẠN</div>
+                <h2>Hôm nay màu gì?</h2>
+                <div class="filters"><button data-filter="natural">☀<span>Tự nhiên</span></button><button class="active"
+                        data-filter="pink">❀<span>Hồng trong veo</span></button><button data-filter="film">✺<span>Film
+                            ấm</span></button><button data-filter="mono">◐<span>Đen trắng</span></button></div><label
+                    class="range-label" for="beauty">Độ hồng sáng <span id="amount">45%</span></label><input id="beauty"
+                    type="range" min="0" max="100" value="45">
+                <p class="hint">Một chút ánh hồng, vẫn là bạn.</p>
+                <div class="divider"></div>
+                <div class="section-label">02 / CHUẨN BỊ LÊN HÌNH</div>
+                <div class="setting"><span>Số ảnh</span>
+                    <div class="segmented" id="shots"><button data-n="2">2</button><button class="active"
+                            data-n="4">4</button></div>
+                </div>
+                <div class="setting"><label for="timer">Đếm ngược</label><select id="timer">
+                        <option value="3">3 giây</option>
+                        <option value="5">5 giây</option>
+                        <option value="10">10 giây</option>
+                    </select></div><p id="frame-count-note" class="hint" aria-live="polite"></p><label class="mirror"><input id="mirror" type="checkbox" checked> Lật gương
+                    camera</label>
+            </aside>
+            <div class="camera-area">
+                <div class="camera-frame">
+                    <div class="camera-top"><span><i></i> LIVE CAMERA</span><span id="progress">SAY CHEESE ♡</span>
+                    </div>
+                    <div class="viewport"><canvas id="preview"></canvas><video id="video" autoplay muted
+                            playsinline></video>
+                        <div id="welcome">
+                            <div class="camera-icon">✿</div>
+                            <h2>Xin chào, người dễ thương!</h2>
+                            <p>Cho Hồng mượn camera để lưu lại<br>một phiên bản thật xinh của bạn nhé.</p><button
+                                id="enable" class="primary">Bật camera <span>↗</span></button><button id="demo"
+                                class="text-button">Khám phá với ảnh mẫu</button>
+                        </div>
+                        <div id="countdown" aria-live="assertive"></div>
+                        <div id="flash"></div><span class="corner-note">you look lovely today ♡</span>
+                    </div>
+                    <div class="camera-bottom"><span id="status" role="status">Camera đang chờ bạn</span><span>✦ HỒNG
+                            STUDIO</span></div>
+                </div>
+                <div class="shoot-row"><span class="handwritten" id="pose">cứ là chính mình nhé ↗</span><button
+                        id="capture" class="shutter" disabled><span>●</span> Chụp một kỷ niệm</button><button
+                        id="switch" class="icon-button" aria-label="Đổi camera">↻</button></div>
+            </div>
+            <aside class="result"><span class="tape"></span>
+                <div class="section-label">KỶ NIỆM CỦA BẠN</div>
+                <div id="strip" class="strip">
+                    <div class="slots" id="slots"></div>
+                    <div class="strip-title">hồng ♡</div>
+                    <div id="strip-date"></div>
+                </div>
+                <p class="handwritten result-note">những điều nhỏ xíu,<br>niềm vui thật to.</p>
+                <div class="swatches" aria-label="Màu khung"><button class="active" data-color="#fffaf3"
+                        style="--swatch:#fffaf3" aria-label="Khung kem"></button><button data-color="#f9dbe3"
+                        style="--swatch:#f9dbe3" aria-label="Khung hồng"></button><button data-color="#dfe8d6"
+                        style="--swatch:#dfe8d6" aria-label="Khung xanh"></button><button data-color="#352a2c"
+                        style="--swatch:#352a2c" aria-label="Khung tối"></button></div><input id="caption"
+                    maxlength="45" placeholder="Viết một lời nhắn nhỏ…" aria-label="Lời nhắn trên ảnh"><button
+                    id="download" disabled>Tải dải ảnh ↓</button><button id="reset" class="text-button">Chụp lại từ
+                    đầu</button>
+            </aside>
+        </section>
+        <footer><span>MADE FOR YOUR LITTLE HAPPY MOMENTS</span><span>Không cần hoàn hảo. Chỉ cần có bạn.
+                ♡</span><span>HỒNG PHOTO CLUB © 2026</span></footer>
+    </main>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/frames.js"></script>
+    <script src="assets/js/couple-frames.js"></script>
+    <script src="assets/js/custom-frame-data.js"></script><script src="assets/js/custom-frames.js"></script><script src="assets/js/frame-picker.js"></script><script src="assets/js/compact.js"></script>
+</body>
+
+</html>
+

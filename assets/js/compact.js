@@ -1,0 +1,14 @@
+document.body.classList.add('compact-layout');
+const resultPanel=$('.result');
+const frameDialog=document.createElement('dialog');frameDialog.className='frame-dialog';frameDialog.setAttribute('aria-label','Bộ sưu tập khung ảnh');
+frameDialog.innerHTML='<div class="dialog-heading"><div><div class="section-label">MỘT CHIẾC KHUNG, MỘT TÂM TRẠNG</div><h2>Chọn khung của bạn ♡</h2></div><button class="close-dialog" aria-label="Đóng bảng khung">×</button></div>';
+frameDialog.append(categories,framePicker);document.body.append(frameDialog);pickerTitle.remove();
+const chooseButton=document.createElement('button');chooseButton.className='choose-frame';chooseButton.innerHTML='<span>♡ Tim hồng</span><small>Đổi khung · 26 mẫu ↗</small>';$('#strip').after(chooseButton);chooseButton.onclick=()=>frameDialog.showModal();
+frameDialog.querySelector('.close-dialog').onclick=()=>frameDialog.close();frameDialog.addEventListener('click',e=>{if(e.target===frameDialog)frameDialog.close();});
+framePicker.querySelectorAll('button').forEach(b=>{const select=b.onclick;b.onclick=()=>{select();chooseButton.querySelector('span').textContent=chosenFrame.mark+' '+chosenFrame.name;frameDialog.close();};});
+$('.result-note').textContent='Chạm ảnh để xem lớn ↗';
+const largeDialog=document.createElement('dialog');largeDialog.className='large-strip-dialog';largeDialog.setAttribute('aria-label','Xem dải ảnh lớn');largeDialog.innerHTML='<button class="close-dialog" aria-label="Đóng ảnh lớn">×</button><img alt="Dải ảnh kỷ niệm của bạn">';document.body.append(largeDialog);
+stripCanvas.setAttribute('role','button');stripCanvas.tabIndex=0;stripCanvas.setAttribute('aria-label','Phóng to dải ảnh');function enlarge(){largeDialog.querySelector('img').src=stripCanvas.toDataURL();largeDialog.showModal();}stripCanvas.onclick=enlarge;stripCanvas.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();enlarge();}};largeDialog.querySelector('button').onclick=()=>largeDialog.close();largeDialog.onclick=e=>{if(e.target===largeDialog)largeDialog.close();};
+function labelRetakes(){document.querySelectorAll("#slots .slot button").forEach((b,i)=>{b.textContent="↻ "+(i+1);b.setAttribute("aria-label","Chụp lại ảnh "+(i+1));});}new MutationObserver(labelRetakes).observe($("#slots"),{childList:true});labelRetakes();
+
+
