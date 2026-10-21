@@ -57,10 +57,10 @@ test('published scripts and face worker use the same release version to avoid st
     const html = read('index.html');
     const sources = [...html.matchAll(/(?:src|href)="(assets\/(?:js|css)\/[^\"]+)"/g)].map(match => match[1]);
     assert.ok(sources.length > 5);
-    assert.ok(sources.every(source => source.includes('?v=20261022-king-1')));
-    const f = fixture('?v=20261022-king-1');
+    assert.ok(sources.every(source => source.includes('?v=20261022-face-fix-1')));
+    const f = fixture('?v=20261022-face-fix-1');
     f.events['camera-ready']();
-    assert.equal(f.workers[0].url.search, '?v=20261022-king-1');
+    assert.equal(f.workers[0].url.search, '?v=20261022-face-fix-1');
 });
 
 test('pose matches center crop, mirror and face roll for landscape and portrait camera', () => {
@@ -241,4 +241,55 @@ test('bundled runtime exposes required APIs, WASM is valid and model is present'
     const model = fs.readFileSync(path.join(root, 'assets/models/face_landmarker.task'));
     assert.ok(model.length > 3000000);
     assert.ok(model.includes(Buffer.from('face_landmarks_detector.tflite')));
+});
+
+test('worker failure switches to browser tracking and keeps following new face positions', async () => {
+    const f = fixture();
+    const backups = [];
+    f.context.createMainFaceTrackerWorker = () => {
+        const worker = { messages: [], postMessage(message) { this.messages.push(message); }, terminate() { this.terminated = true; } };
+        backups.push(worker); return worker;
+    };
+    f.events['camera-ready']();
+    f.workers[0].send({ type: 'error', detail: 'Worker WebGL unavailable' });
+    assert.equal(f.workers[0].terminated, true);
+    assert.equal(f.state().state, 'loading');
+    assert.equal(f.state().useMain, true);
+    const backup = backups[0];
+    backup.onmessage({ data: { type: 'ready' } });
+    for (const offset of [0, .1]) {
+        f.advance(150); f.source.currentTime++;
+        f.context.updateFaceTracking(f.source, 800, 600, false, false);
+        await tick();
+        const request = backup.messages.at(-1);
+        assert.equal(request.bitmap.source, f.source);
+        backup.onmessage({ data: { type: 'result', id: request.id, points: Object.fromEntries(Object.entries(landmarks).map(([key, point]) => [key, { x: point.x + offset, y: point.y }])) } });
+        if (!offset) var firstX = f.state().pose.x;
+        else assert.ok(f.state().pose.x > firstX);
+    }
+    assert.equal(f.state().state, 'ready');
+    assert.equal(f.element('#face-tracking-retry').hidden, true);
+    f.events.pagehide(); assert.equal(backup.terminated, true);
+});
+
+test('browser fallback explicitly supplies a DOM canvas and closes inference resources', async () => {
+    const events = [], canvas = {}, source = {}; let options, closed = 0, bitmapClosed = 0;
+    const tracker = { detectForVideo(image) { assert.equal(image, source); return { faceLandmarks: [landmarks] }; }, close() { closed++; } };
+    const sandbox = { URL, window: {}, document: {
+        currentScript: { src: 'https://example.test/assets/js/face-tracker-fallback.js' },
+        createElement(type) { return type === 'canvas' ? canvas : { remove() {} }; },
+        head: { appendChild(script) {
+            sandbox.window.exports.FilesetResolver = { forVisionTasks: async () => ({}) };
+            sandbox.window.exports.FaceLandmarker = { createFromOptions: async (_, value) => { options = value; return tracker; } };
+            script.onload();
+        } }
+    } };
+    vm.createContext(sandbox); vm.runInContext(read('assets/js/face-tracker-fallback.js'), sandbox);
+    const adapter = sandbox.createMainFaceTrackerWorker(); adapter.onmessage = event => events.push(event.data);
+    adapter.postMessage({ type: 'init' }); await tick();
+    assert.equal(options.canvas, canvas); assert.equal(events[0].type, 'ready');
+    assert.equal('exports' in sandbox.window, false);
+    adapter.postMessage({ type: 'frame', id: 2, bitmap: { source, close() { bitmapClosed++; } }, timestamp: 1000 }); await tick();
+    assert.equal(events[1].points, landmarks); assert.equal(bitmapClosed, 1);
+    adapter.terminate(); assert.equal(closed, 1);
 });

@@ -4,7 +4,7 @@ const faceTrackingRetry = document.querySelector('#face-tracking-retry');
 const faceWorkerUrl = new URL('face-tracker-worker.js', document.currentScript.src);
 faceWorkerUrl.search = new URL(document.currentScript.src).search;
 const faceTracking = {
-    worker: null, state: 'idle', pose: null, context: null,
+    worker: null, state: 'idle', pose: null, context: null, useMain: false,
     request: null, serial: 0, generation: 0, timer: null,
     lastFrameTime: -1, lastRequestAt: -Infinity, lastSeenAt: 0
 };
@@ -25,18 +25,27 @@ function failFaceTracking() {
     faceTracking.request = null;
     faceTracking.state = 'failed';
     clearFaceTrackingPose();
+    if (!faceTracking.useMain && typeof createMainFaceTrackerWorker === 'function') {
+        faceTracking.useMain = true;
+        faceTracking.state = 'idle';
+        startFaceTracking();
+        return;
+    }
     faceTrackingRetry.hidden = false;
     setFaceTrackingStatus('Chưa bật được bám mặt. Bạn có thể kéo filter thủ công hoặc bấm thử lại.');
     if (typeof updateStickerInteraction === 'function') updateStickerInteraction();
 }
 function startFaceTracking() {
     if (!faceFollow.checked || ['loading', 'ready', 'failed'].includes(faceTracking.state)) return;
-    if (!window.Worker || !window.createImageBitmap) { failFaceTracking(); return; }
+    if (!window.Worker || !window.createImageBitmap) {
+        if (typeof createMainFaceTrackerWorker !== 'function') { failFaceTracking(); return; }
+        faceTracking.useMain = true;
+    }
     faceTracking.state = 'loading';
     faceTrackingRetry.hidden = true;
     setFaceTrackingStatus('Đang chuẩn bị bám khuôn mặt…');
     try {
-        const worker = new Worker(faceWorkerUrl);
+        const worker = faceTracking.useMain ? createMainFaceTrackerWorker() : new Worker(faceWorkerUrl);
         faceTracking.worker = worker;
         faceTracking.timer = setTimeout(failFaceTracking, 45000);
         worker.onerror = event => { event.preventDefault(); if (faceTracking.worker === worker) failFaceTracking(); };
@@ -123,13 +132,13 @@ function updateFaceTracking(source, width, height, mirror, isDemo) {
         faceTracking.pose = null; setFaceTrackingStatus('Đang tìm lại khuôn mặt…');
     }
     // One frame in flight and at most 12 detections per second; rendering is independent.
-    if (document.hidden || faceTracking.request || now - faceTracking.lastRequestAt < 83 || source.currentTime === faceTracking.lastFrameTime) return;
+    if (document.hidden || faceTracking.request || now - faceTracking.lastRequestAt < (faceTracking.useMain ? 125 : 83) || source.currentTime === faceTracking.lastFrameTime) return;
     const request = { id: ++faceTracking.serial, generation: faceTracking.generation, context };
     faceTracking.request = request;
     faceTracking.lastFrameTime = source.currentTime;
     faceTracking.lastRequestAt = now;
     faceTracking.timer = setTimeout(failFaceTracking, 10000);
-    Promise.resolve().then(() => createImageBitmap(source)).then(bitmap => {
+    Promise.resolve().then(() => faceTracking.useMain ? { source, close() {} } : createImageBitmap(source)).then(bitmap => {
         if (faceTracking.request !== request || request.generation !== faceTracking.generation) {
             bitmap.close();
             if (faceTracking.request === request) { clearTimeout(faceTracking.timer); faceTracking.request = null; }
@@ -156,6 +165,10 @@ faceFollow.addEventListener('change', () => {
     updateStickerInteraction();
 });
 faceTrackingRetry.addEventListener('click', () => {
+    faceTracking.worker?.terminate();
+    clearTimeout(faceTracking.timer);
+    faceTracking.request = null;
+    clearFaceTrackingPose();
     faceTracking.state = 'idle';
     if (stream && !demo) startFaceTracking();
     updateStickerInteraction();

@@ -19,7 +19,7 @@ self.onmessage = async event => {
                 minFaceDetectionConfidence: .55, minFacePresenceConfidence: .55, minTrackingConfidence: .55
             });
             self.postMessage({ type: 'ready' });
-        } catch { self.postMessage({ type: 'error' }); }
+        } catch (error) { self.postMessage({ type: 'error', detail: String(error) }); }
         return;
     }
     if (message.type !== 'frame') return;
@@ -32,6 +32,6 @@ self.onmessage = async event => {
         const smile = categories.filter(item => item.categoryName === 'mouthSmileLeft' || item.categoryName === 'mouthSmileRight')
             .reduce((sum, item) => sum + item.score, 0) / 2;
         self.postMessage({ type: 'result', id: message.id, points, smile });
-    } catch { self.postMessage({ type: 'error', id: message.id }); }
+    } catch (error) { self.postMessage({ type: 'error', id: message.id, detail: String(error) }); }
     finally { message.bitmap.close(); }
 };

@@ -1,0 +1,8 @@
+<!doctype html><meta charset="utf-8"><title>Face tracking check</title><pre id="result">Starting…</pre><script src="js/face-tracker-fallback.js"></script><script>
+const out=document.querySelector('#result');
+const worker=new Worker('js/face-tracker-worker.js');
+worker.onmessage=e=>{out.textContent+='\nWorker: '+JSON.stringify(e.data);};
+worker.onerror=e=>out.textContent+='\nWorker: '+e.message;
+worker.postMessage({type:'init'});
+const fallback=createMainFaceTrackerWorker();fallback.onmessage=e=>out.textContent+='\nFallback: '+JSON.stringify(e.data);fallback.postMessage({type:'init'});
+</script>
