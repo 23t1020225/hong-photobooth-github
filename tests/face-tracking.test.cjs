@@ -57,10 +57,10 @@ test('published scripts and face worker use the same release version to avoid st
     const html = read('index.html');
     const sources = [...html.matchAll(/(?:src|href)="(assets\/(?:js|css)\/[^\"]+)"/g)].map(match => match[1]);
     assert.ok(sources.length > 5);
-    assert.ok(sources.every(source => source.includes('?v=20261022-face-fix-1')));
-    const f = fixture('?v=20261022-face-fix-1');
+    assert.ok(sources.every(source => source.includes('?v=20261022-face-fix-2')));
+    const f = fixture('?v=20261022-face-fix-2');
     f.events['camera-ready']();
-    assert.equal(f.workers[0].url.search, '?v=20261022-face-fix-1');
+    assert.equal(f.workers[0].url.search, '?v=20261022-face-fix-2');
 });
 
 test('pose matches center crop, mirror and face roll for landscape and portrait camera', () => {

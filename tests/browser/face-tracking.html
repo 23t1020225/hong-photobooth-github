@@ -1,4 +1,4 @@
-<!doctype html><meta charset="utf-8"><title>Face tracking check</title><pre id="result">Starting…</pre><script src="js/face-tracker-fallback.js"></script><script>
+<!doctype html><meta charset="utf-8"><title>Face tracking check</title><pre id="result">Starting…</pre><script src="../../assets/js/face-tracker-fallback.js"></script><script>
 const out=document.querySelector('#result');
 const image=new Image();image.crossOrigin='anonymous';image.src='https://storage.googleapis.com/mediapipe-assets/portrait.jpg';
 const imageReady=new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=reject});
@@ -27,6 +27,6 @@ function run(worker,label){
  worker.onerror=e=>out.textContent+='\n'+label+': '+e.message;
  worker.postMessage({type:'init'});
 }
-run(new Worker('js/face-tracker-worker.js'),'Worker');
+run(new Worker('../../assets/js/face-tracker-worker.js'),'Worker');
 run(createMainFaceTrackerWorker(),'Fallback');
 </script>
