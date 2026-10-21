@@ -59,9 +59,9 @@ hỗ trợ hoặc tải lỗi, giao diện cho phép thử lại và chuyển sa
 
 Kiểm tra logic: `node --test tests/*.test.cjs`.
 
-## Bộ sưu tập 26 filter
+## Bộ sưu tập 27 filter
 
-Bảng chọn gồm 14 mẫu đã duyệt, Gián đáng yêu và 11 filter ban đầu, có hình xem trước từ
+Bảng chọn gồm 14 mẫu đã duyệt, Gián đáng yêu, Gián King và 11 filter ban đầu, có hình xem trước từ
 chính hiệu ứng được vẽ trên camera. Có thể lọc theo Dễ thương, Mặt nạ, Phụ kiện
 hoặc Bộ đầu tiên; tùy chọn Không dùng luôn hiện để dễ tắt hiệu ứng.
 
@@ -81,3 +81,11 @@ mascot gián ở góc dưới. Chỉ Gián đáng yêu dùng phần phóng mắt
 giữ nguyên khuôn mặt. Khi tắt bám mặt hoặc dùng ảnh mẫu, phần phóng mắt tắt
 vì không có điểm mắt thật. Hình ảnh và chuyển động là bản dựng gần giống,
 không bảo đảm trùng hoàn toàn với engine và tài nguyên TikTok gốc.
+
+“Gián King” lấy cảm hứng từ Chaoxiongxiang King (3086335461) của dnbeautyeffect.
+Hiệu ứng làm phồng mặt/mũi bằng WebGL, bám theo vị trí/độ nghiêng khuôn mặt,
+vẽ râu dài và mascot ở góc trên. Thiết bị thiếu WebGL dùng phiên bản Canvas 2D
+với biến dạng nhẹ hơn. Ảnh mẫu cũng hiển thị biến dạng; camera thật cần bật bám
+mặt để xác định đúng vùng áp dụng. Đây là bản tái tạo theo demo công khai,
+không phải tài nguyên, mã hay gói TikTok gốc. Ảnh chụp giữ phần biến dạng và
+trang trí trong cùng bitmap để ghép khung và tải PNG.

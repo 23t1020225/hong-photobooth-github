@@ -56,6 +56,10 @@ function drawStickerFilter(context, width, height) {
     const pose = getTrackedStickerPose();
     if (!pose) return;
     if (stickerState.type === 'cute-roach' && !pose.manual) applyCuteRoachFaceLook(context, pose, width, height);
+    if (stickerState.type === 'king-roach' && !pose.manual) applyKingFaceLook(context, pose, width, height);
+    if (stickerState.type === 'king-roach' && pose.manual && demo) {
+        applyKingFaceLook(context, { x: width*.5, y: height*.41, scaleX: width/800*.82, scaleY: height/600*.82, angle: 0 }, width, height);
+    }
     context.save();
     context.filter = 'none';
     if (pose.manual) {
@@ -79,10 +83,12 @@ function drawStickerFilter(context, width, height) {
     drawCharacterSticker(context, stickerState.type, pose.smile || 0, { outline });
     context.restore();
     if (stickerState.type === 'cute-roach') drawCuteRoachMascot(context, width, height);
+    if (stickerState.type === 'king-roach') drawKingMascot(context, width, height);
 }
 
 function drawCharacterSticker(context, type, smile = 0, options = {}) {
-    if (cuteFilterTypes.has(type)) drawCuteSticker(context, type, smile, options);
+    if (type === 'king-roach') drawKingSticker(context);
+    else if (cuteFilterTypes.has(type)) drawCuteSticker(context, type, smile, options);
     else if (type === 'roach') drawRoachSticker(context);
     else if (['cat', 'bunny'].includes(type)) drawAnimalSticker(context, type);
     else drawSocialSticker(context, type);
@@ -242,7 +248,7 @@ stickerButtons.forEach(button => {
     c.fillStyle = '#f4e6e5'; c.fillRect(0, 0, 180, 180);
     c.translate(90, 94); c.scale(.28, .28);
     cuteEllipse(c, 0, 330, 180, 190, '#c4a5ad');
-    cuteEllipse(c, 0, 16, 121, 146, '#f6dece');
+    cuteEllipse(c, 0, 16, button.dataset.sticker === 'king-roach' ? 156 : 121, 146, '#f6dece');
     c.strokeStyle = '#805c60'; c.lineWidth = 8; c.lineCap = 'round';
     for (const side of [-1, 1]) cuteEllipse(c, side * 58, -16, 6, 8, '#805c60');
     c.beginPath(); c.arc(0, 64, 22, 0, Math.PI); c.stroke();

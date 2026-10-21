@@ -57,10 +57,10 @@ test('published scripts and face worker use the same release version to avoid st
     const html = read('index.html');
     const sources = [...html.matchAll(/(?:src|href)="(assets\/(?:js|css)\/[^\"]+)"/g)].map(match => match[1]);
     assert.ok(sources.length > 5);
-    assert.ok(sources.every(source => source.includes('?v=20261022-roach-detail-2')));
-    const f = fixture('?v=20261022-roach-detail-2');
+    assert.ok(sources.every(source => source.includes('?v=20261022-king-1')));
+    const f = fixture('?v=20261022-king-1');
     f.events['camera-ready']();
-    assert.equal(f.workers[0].url.search, '?v=20261022-roach-detail-2');
+    assert.equal(f.workers[0].url.search, '?v=20261022-king-1');
 });
 
 test('pose matches center crop, mirror and face roll for landscape and portrait camera', () => {
@@ -184,8 +184,9 @@ test('all character effects use the tracked transform, including forehead anchor
     const c = vm.createContext({ document: { querySelector: get, querySelectorAll: () => buttons }, getTrackedStickerPose: () => pose });
     vm.runInContext(read('assets/js/cute-filters.js'), c);
     vm.runInContext(read('assets/js/face-look.js'), c);
+    vm.runInContext(read('assets/js/king-filter.js'), c);
     vm.runInContext(read('assets/js/sticker-filter.js'), c);
-    const drawing = new Proxy({ createLinearGradient: () => ({ addColorStop() {} }) }, { get: (object, method) => method in object ? object[method] : (...args) => calls.push([method, ...args]) });
+    const drawing = new Proxy({ canvas: null, createLinearGradient: () => ({ addColorStop() {} }) }, { get: (object, method) => method in object ? object[method] : (...args) => calls.push([method, ...args]) });
     const types = [...read('index.html').matchAll(/data-sticker="([^"]+)"/g)].map(match => match[1]);
     for (const type of types.filter(type => type !== 'none')) {
         vm.runInContext(`stickerState.type = '${type}'`, c);

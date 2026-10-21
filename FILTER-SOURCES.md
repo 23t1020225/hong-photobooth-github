@@ -76,3 +76,16 @@ the flower veil is a 2D illustration, not a cloth simulation or imported 3D effe
   (1.22x horizontal, 1.30x vertical) with feathered edges. This is an approximation
   of the reference's look, not the original deformation algorithm or face makeup.
   It is skipped without reliable eye landmarks, including manual/demo mode.
+
+## Additional TikTok reference: Gián King
+
+- Source: https://www.tiktok.com/effect/Chaoxiongxiang-King-3086335461
+- Creator: dnbeautyeffect.
+- Demo inspected: https://www.tiktok.com/@nguyenmiinhkhaa/video/7560667915805101319
+- Website key: king-roach, category: cute.
+- Original reconstruction: broad-face/nose distortion, long angular antennae,
+  and a small brown cockroach mascot near the upper-left of the camera.
+- The main deformation uses a local WebGL fragment shader and the tracked
+  position, scale and roll; a feathered Canvas 2D fallback is available.
+  No original TikTok assets, frames or proprietary deformation parameters are
+  bundled. Appearance is approximate and differs between GPU and fallback.
