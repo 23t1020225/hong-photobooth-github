@@ -8,7 +8,12 @@ frameDialog.querySelector('.close-dialog').onclick=()=>frameDialog.close();frame
 framePicker.querySelectorAll('button').forEach(b=>{const select=b.onclick;b.onclick=()=>{select();chooseButton.querySelector('span').textContent=chosenFrame.mark+' '+chosenFrame.name;frameDialog.close();};});
 $('.result-note').textContent='Chạm ảnh để xem lớn ↗';
 const largeDialog=document.createElement('dialog');largeDialog.className='large-strip-dialog';largeDialog.setAttribute('aria-label','Xem dải ảnh lớn');largeDialog.innerHTML='<button class="close-dialog" aria-label="Đóng ảnh lớn">×</button><img alt="Dải ảnh kỷ niệm của bạn">';document.body.append(largeDialog);
-stripCanvas.setAttribute('role','button');stripCanvas.tabIndex=0;stripCanvas.setAttribute('aria-label','Phóng to dải ảnh');function enlarge(){largeDialog.querySelector('img').src=stripCanvas.toDataURL();largeDialog.showModal();}stripCanvas.onclick=enlarge;stripCanvas.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();enlarge();}};largeDialog.querySelector('button').onclick=()=>largeDialog.close();largeDialog.onclick=e=>{if(e.target===largeDialog)largeDialog.close();};
+stripCanvas.setAttribute('role','button');stripCanvas.tabIndex=0;stripCanvas.setAttribute('aria-label','Phóng to dải ảnh');async function enlarge(){if(largeDialog.open||!(await updateCutePreview()))return;largeDialog.querySelector('img').src=stripCanvas.toDataURL();largeDialog.showModal();}stripCanvas.onclick=enlarge;stripCanvas.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();enlarge();}};largeDialog.querySelector('button').onclick=()=>largeDialog.close();largeDialog.onclick=e=>{if(e.target===largeDialog)largeDialog.close();};
 function labelRetakes(){document.querySelectorAll("#slots .slot button").forEach((b,i)=>{b.textContent="↻ "+(i+1);b.setAttribute("aria-label","Chụp lại ảnh "+(i+1));});}new MutationObserver(labelRetakes).observe($("#slots"),{childList:true});labelRetakes();
 
 
+
+document.addEventListener('photos-captured',()=>{
+ if(!window.matchMedia('(max-width: 550px)').matches)return;
+ requestAnimationFrame(()=>resultPanel.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'}));
+});

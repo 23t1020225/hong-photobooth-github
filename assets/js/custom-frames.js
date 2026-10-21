@@ -23,4 +23,8 @@ function loadFrameAsset(frame){
 const customFramesReady=Promise.allSettled(customFrames.map(loadFrameAsset));
 const paintBeforeCustom=paintCuteStrip;
 paintCuteStrip=function(c,f,images,n,caption,dateText){if(!f.custom)return paintBeforeCustom(c,f,images,n,caption,dateText);const asset=frameAssets.get(f.id);c.canvas.width=f.width;c.canvas.height=f.height+90;c.fillStyle='#fff9f3';c.fillRect(0,0,c.canvas.width,c.canvas.height);for(let i=0;i<f.slots.length;i++){const [x,y,w,h]=f.slots[i],im=images[i];if(im){const s=Math.max(w/im.width,h/im.height),sw=w/s,sh=h/s;c.drawImage(im,(im.width-sw)/2,(im.height-sh)/2,sw,sh,x,y,w,h);}else{c.fillStyle='#e9ddd8';c.fillRect(x,y,w,h);c.fillStyle='#b28b8b';c.textAlign='center';c.font=`${Math.max(15,w*.15)}px Georgia`;c.fillText('♡',x+w/2,y+h/2);}}if(asset)c.drawImage(asset,0,0);c.fillStyle='#79504d';c.textAlign='center';c.font=`${Math.max(13,f.width*.032)}px sans-serif`;c.fillText(caption||'một chút hồng, một chút bạn.',f.width/2,f.height+36,f.width-24);c.font=`${Math.max(10,f.width*.022)}px sans-serif`;c.fillText(dateText,f.width/2,f.height+68);return c.canvas;};
-customFramesReady.then(()=>{document.querySelectorAll('.frame-picker button[data-frame]').forEach(b=>{const f=customFrames.find(x=>x.id===b.dataset.frame);if(f)paintCuteStrip(b.querySelector('canvas').getContext('2d'),f,[],f.slots.length,'','');});updateCutePreview();});
+// Refresh each thumbnail independently; a slow frame cannot hold up the others.
+customFrames.forEach(frame=>loadFrameAsset(frame).then(()=>{
+ const button=document.querySelector('.frame-picker button[data-frame="'+frame.id+'"]');
+ if(button)paintCuteStrip(button.querySelector('canvas').getContext('2d'),frame,[],frame.slots.length,'','');
+},()=>{}));
