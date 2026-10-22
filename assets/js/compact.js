@@ -6,6 +6,7 @@ frameDialog.innerHTML='<div class="dialog-heading"><div><div class="section-labe
 frameDialog.append(categories,framePicker);document.body.append(frameDialog);pickerTitle.remove();
 const chooseButton=document.createElement('button');chooseButton.className='choose-frame';chooseButton.innerHTML='<span>♡ Tim hồng</span><small>Đổi khung · 26 mẫu ↗</small>';$('#strip').after(chooseButton);chooseButton.onclick=()=>frameDialog.showModal();
 const reviewPhotosButton=document.createElement('button');reviewPhotosButton.id='review-photos';reviewPhotosButton.className='review-photos';reviewPhotosButton.type='button';reviewPhotosButton.textContent='♡ Chọn lại ảnh yêu thích';reviewPhotosButton.hidden=true;chooseButton.after(reviewPhotosButton);
+reviewPhotosButton.onclick=()=>document.dispatchEvent(new Event('photo-review-open'));
 frameDialog.querySelector('.close-dialog').onclick=()=>frameDialog.close();frameDialog.addEventListener('click',e=>{if(e.target===frameDialog)frameDialog.close();});
 framePicker.querySelectorAll('button').forEach(b=>{const select=b.onclick;b.onclick=()=>{select();chooseButton.querySelector('span').textContent=chosenFrame.mark+' '+chosenFrame.name;frameDialog.close();};});
 $('.result-note').textContent='Chạm ảnh để xem lớn ↗';
