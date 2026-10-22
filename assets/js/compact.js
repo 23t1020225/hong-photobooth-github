@@ -1,9 +1,11 @@
 document.body.classList.add('compact-layout');
 const resultPanel=$('.result');
+resultPanel.hidden=true;
 const frameDialog=document.createElement('dialog');frameDialog.className='frame-dialog';frameDialog.setAttribute('aria-label','Bộ sưu tập khung ảnh');
 frameDialog.innerHTML='<div class="dialog-heading"><div><div class="section-label">MỘT CHIẾC KHUNG, MỘT TÂM TRẠNG</div><h2>Chọn khung của bạn ♡</h2></div><button class="close-dialog" aria-label="Đóng bảng khung">×</button></div>';
 frameDialog.append(categories,framePicker);document.body.append(frameDialog);pickerTitle.remove();
 const chooseButton=document.createElement('button');chooseButton.className='choose-frame';chooseButton.innerHTML='<span>♡ Tim hồng</span><small>Đổi khung · 26 mẫu ↗</small>';$('#strip').after(chooseButton);chooseButton.onclick=()=>frameDialog.showModal();
+const reviewPhotosButton=document.createElement('button');reviewPhotosButton.id='review-photos';reviewPhotosButton.className='review-photos';reviewPhotosButton.type='button';reviewPhotosButton.textContent='♡ Chọn lại ảnh yêu thích';reviewPhotosButton.hidden=true;chooseButton.after(reviewPhotosButton);
 frameDialog.querySelector('.close-dialog').onclick=()=>frameDialog.close();frameDialog.addEventListener('click',e=>{if(e.target===frameDialog)frameDialog.close();});
 framePicker.querySelectorAll('button').forEach(b=>{const select=b.onclick;b.onclick=()=>{select();chooseButton.querySelector('span').textContent=chosenFrame.mark+' '+chosenFrame.name;frameDialog.close();};});
 $('.result-note').textContent='Chạm ảnh để xem lớn ↗';
@@ -13,7 +15,10 @@ function labelRetakes(){document.querySelectorAll("#slots .slot button").forEach
 
 
 
-document.addEventListener('photos-captured',()=>{
- if(!window.matchMedia('(max-width: 550px)').matches)return;
- requestAnimationFrame(()=>resultPanel.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'}));
+document.addEventListener('photos-selected',()=>{
+ resultPanel.hidden=false;
+ reviewPhotosButton.hidden=false;
+ frameDialog.showModal();
+ if(window.matchMedia('(max-width: 550px)').matches)requestAnimationFrame(()=>resultPanel.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'}));
 });
+$('#reset').addEventListener('click',()=>{resultPanel.hidden=true;reviewPhotosButton.hidden=true;if(frameDialog.open)frameDialog.close();});
