@@ -6,7 +6,7 @@ faceWorkerUrl.search = new URL(document.currentScript.src).search;
 const faceTracking = {
     worker: null, state: 'idle', pose: null, context: null, useMain: false,
     request: null, serial: 0, generation: 0, timer: null,
-    lastFrameTime: -1, lastRequestAt: -Infinity, lastSeenAt: 0
+    lastFrameTime: -1, lastRequestAt: -Infinity, lastSeenAt: 0, noFaceCount: 0
 };
 function setFaceTrackingStatus(text) {
     if (faceTrackingStatus.textContent !== text) faceTrackingStatus.textContent = text;
@@ -17,6 +17,7 @@ function clearFaceTrackingPose() {
     faceTracking.context = null;
     faceTracking.lastSeenAt = 0;
     faceTracking.lastFrameTime = -1;
+    faceTracking.noFaceCount = 0;
 }
 function failFaceTracking() {
     clearTimeout(faceTracking.timer);
@@ -70,9 +71,16 @@ function startFaceTracking() {
             const pose = message.points && facePoseFromLandmarks(message.points, request.context);
             if (!pose) {
                 faceTracking.pose = null;
-                setFaceTrackingStatus('Chưa thấy khuôn mặt. Nhìn thẳng camera ở nơi đủ sáng nhé.');
+                faceTracking.noFaceCount++;
+                if (!faceTracking.useMain && faceTracking.noFaceCount >= 18) {
+                    setFaceTrackingStatus('Đang thử lại cách bám mặt tương thích hơn với Chrome…');
+                    failFaceTracking();
+                    return;
+                }
+                setFaceTrackingStatus('Chưa thấy khuôn mặt. Đưa mặt vào giữa khung và tăng sáng nhé.');
                 return;
             }
+            faceTracking.noFaceCount = 0;
             pose.smile = Number.isFinite(message.smile) ? Math.max(0, Math.min(1, message.smile)) : 0;
             const previous = faceTracking.pose;
             if (previous) for (const key of ['x', 'y', 'scaleX', 'scaleY', 'foreheadX', 'foreheadY', 'smile']) {
